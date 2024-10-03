@@ -88,7 +88,7 @@ function Login() {
             required
           />
           <NavLink
-            to="/fotp"
+            to="/forgotpassword"
             className="text-end text-sm hover:underline"
           >
             ForgotPassword?

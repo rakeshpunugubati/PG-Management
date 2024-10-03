@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
-    userId:{
+    email:{
         type: String,
         required: true,
-        unique: true,
     },
     otp:{
         type: String,
@@ -14,7 +13,7 @@ const userSchema = mongoose.Schema({
     createdAt: { 
         type: Date, 
         default: Date.now, 
-        expires: 60, 
+        expires: 300, 
       }
     
 });

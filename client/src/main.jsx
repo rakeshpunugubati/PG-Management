@@ -11,7 +11,6 @@ import Admin from './Components/Admin'
 import ForgotPassword from './Components/ForgotPassword';
 import Register from './Components/Register';
 import OtpVerification from './Components/OtpVerification';
-import ForgotPasswordWithOtp from './forgototp';
 const router = createBrowserRouter(
   [
     {
@@ -26,10 +25,6 @@ const router = createBrowserRouter(
         {
           path:'/admin',
           element: <Admin />,
-        },
-        {
-          path: 'fotp',
-          element: <ForgotPasswordWithOtp />
         },
         {
           path: '/forgotpassword',
