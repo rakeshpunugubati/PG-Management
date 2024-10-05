@@ -7,10 +7,11 @@ function VerifyOtp({ n = 6 }) {
 	const ref = useRef([])
 	const [loading, setLoading] = useState(true)
 	const navigate = useNavigate()
+	
 	const handleSubmit = async () => {
 		try {
-			const response = axios.post("http://localhost:5000/verifyotp", {
-				otp: verifyOtp,
+			const response = axios.get("http://localhost:5000/verifyotp", {
+				userOtp: verifyOtp,
 			})
 		} catch (error) {}
 	}
@@ -56,7 +57,7 @@ function VerifyOtp({ n = 6 }) {
 		if (ref.current[0]) {
 			ref.current[0].focus()
 		}
-		checkOtpAccess()
+		// checkOtpAccess()
 	}, [])
 
 	if (loading) {
