@@ -1,45 +1,67 @@
-import axios from "axios";
+import axios from "axios"
 import React, { useEffect, useRef, useState } from "react"
-
-function OtpVerification({ n = 6 }) {
+import { useNavigate } from "react-router-dom"
+function VerifyOtp({ n = 6 }) {
 	const [otp, setOtp] = useState(new Array(n).fill(""))
-    const[verifyOtp , setVerifyOtp] = useState('');
+	const [verifyOtp, setVerifyOtp] = useState("")
 	const ref = useRef([])
+	const [loading, setLoading] = useState(true)
+	const navigate = useNavigate()
+	const handleSubmit = async () => {
+		try {
+			const response = axios.post("http://localhost:5000/verifyotp", {
+				otp: verifyOtp,
+			})
+		} catch (error) {}
+	}
 
-    const handleSubmit = async() =>{
-
-        try{
-            const response = axios.post('',{otp:verifyOtp})
-        }
-        catch(error){
-
-        }
-    }
+	const checkOtpAccess = async () => {
+		try {
+			const response = await axios.get(
+				"http://localhost:5000/verifyotp",
+				{ withCredentials: true }
+			)
+			console.log(response)
+			setLoading(false)
+			// If successful, continue as planned.
+		} catch (error) {
+			if (error.response.status === 401) {
+				console.log(error.response.data.message)
+			} else {
+				console.log("An error occurred: ", error.message)
+			}
+			navigate("/forgotpassword")
+		}
+	}
 
 	const handleKeyDown = (e, index) => {
 		const key = e.key
-		if (key === "Backspace" && !otp[index] &&  index > 0) {
-			ref.current[index-1].focus();
+		if (key === "Backspace" && !otp[index] && index > 0) {
+			ref.current[index - 1].focus()
 		}
 	}
 
 	const handleChange = (value, index) => {
-		if (isNaN(value)) return;
+		if (isNaN(value)) return
 		let newOtp = [...otp]
 		newOtp[index] = value[value.length - 1]
 		if (value && index < otp.length - 1) {
 			ref.current[index + 1].focus()
 		}
-		setOtp(newOtp);
-        setVerifyOtp(newOtp.join(''));
+		setOtp(newOtp)
+		setVerifyOtp(newOtp.join(""))
 	}
 
 	useEffect(() => {
 		if (ref.current[0]) {
 			ref.current[0].focus()
 		}
+		checkOtpAccess()
 	}, [])
 
+	if (loading) {
+		return <div>Loading...</div>
+	}
 	return (
 		<div className="w-full h-screen flex  justify-center items-center  text-gray-700 ">
 			<div className="flex flex-col  gap-5 p-10 sm:p-0">
@@ -70,10 +92,15 @@ function OtpVerification({ n = 6 }) {
 						)
 					})}
 				</div>
-                <button onSubmit={handleSubmit} className="text-xl text-black w-full p-2 bg-green-500 rounded-md">Verify OTP</button>
+				<button
+					onSubmit={handleSubmit}
+					className="text-xl text-black w-full p-2 bg-green-500 rounded-md"
+				>
+					Verify OTP
+				</button>
 			</div>
 		</div>
 	)
 }
 
-export default OtpVerification
+export default VerifyOtp

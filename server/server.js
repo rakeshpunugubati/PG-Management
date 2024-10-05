@@ -6,12 +6,19 @@ dotenv.config()
 const logincredentials = require("./models/user.model.js")
 const otpcenter = require("./models/otp.model.js")
 const app = express()
-const nodemailer = require("./utils/nodemailer.js")
 const sendMail = require("./utils/nodemailer.js")
-mongoose.connect(process.env.MONGODB_URI)
+const cookieParser = require("cookie-parser")
 
-app.use(cors())
+const createToken = require("./utils/tokenUtils.js")
+
+mongoose.connect(process.env.MONGODB_URI)
+const corseOptioins = {
+	origin: "http://localhost:5173", // change domain during production
+	credentials: true,
+}
+app.use(cors(corseOptioins))
 app.use(express.json())
+app.use(cookieParser())
 
 app.post("/", (req, res) => {
 	console.log(req.body)
@@ -56,23 +63,51 @@ app.post("/register", async (req, res) => {
 app.post("/sendotp", async (req, res) => {
 	try {
 		const { email } = req.body
-		const exist = await logincredentials.findOne({ email })
-		console.log(exist)
+		const exist = await logincredentials.exists({ email })
+		console.log(`exist: ${exist._id}`)
 		if (exist) {
 			const otp = generateOtp()
 			const otpexist = await otpcenter.exists({ email })
+			// console.log(otpexist)
 			if (otpexist) {
-				const updatedOpt = await otpcenter.updateOne({ email, otp })
+				const id = otpexist._id
+				console.log(`otpexist: ${id}`)
+
+				const updatedOpt = await otpcenter.updateOne(
+					{ _id: id },
+					{ $set: { otp, createdAt: Date.now() } }
+				)
 				console.log(updatedOpt)
+				const payLoad = { id: updatedOpt._id }
+				const verifyToken = createToken(payLoad)
+				// console.log(verifyToken);
+				res.clearCookie("verifyToken")
+				res.cookie("verifyToken", verifyToken, {
+					httpOnly: true,
+					secure: false, // set secure to true during production
+					maxAge: 300000,
+					sameSite: 'Lax',
+				})
 			} else {
-				await otpcenter.create({ email, otp })
+				const otpcreated = await otpcenter.create({ email, otp })
+				console.log(otpcreated)
+				const payLoad = { id: otpcreated._id }
+				const verifyToken = createToken(payLoad)
+				// console.log(verifyToken);
+				res.cookie("verifyToken", verifyToken, {
+					httpOnly: true,
+					secure: false, // set secure to true during production
+					maxAge: 300000,
+				})
 			}
-			await sendMail(email, otp)
+			// const info = await sendMail(email, otp)
+			// console.log(info);
 			return res.status(200).json({ message: "OTP created successfully" })
 		} else {
 			return res.status(404).json({ message: "User does not exist" })
 		}
 	} catch (error) {
+		console.log(error.message)
 		res.status(500).json({
 			message: "Error creating OTP",
 			error: error.message,
@@ -87,6 +122,19 @@ const generateOtp = () => {
 	}
 	return otp
 }
+
+app.post("/verifyotp", async (req, res) => {
+	const { otp } = req.body
+})
+
+app.get("/verifyotp", async (req, res) => {
+	
+	if (!req.cookies["verifyToken"]) {
+		return res.status(401).json({ message: "Unauthorized Action" })
+	}
+
+	res.status(200).send("you have access")
+})
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {

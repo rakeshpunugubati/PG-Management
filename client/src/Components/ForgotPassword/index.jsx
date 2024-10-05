@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-function index() {
+function ForgotPassword() {
 	const [email, setEmail] = useState("")
 	const [wait, setWait] = useState(false)
 	const navigate = useNavigate()
@@ -10,11 +10,13 @@ function index() {
 
 		try {
 			setWait(true)
-			const response = await axios.post("http://localhost:5000/sendotp", {
-				email,
-			})
+			const response = await axios.post(
+				"http://localhost:5000/sendotp",
+				{ email },
+				{ withCredentials: true }
+			)
 			if (response.status === 200) {
-				navigate("/otpverification")
+				navigate('/verifyotp')
 			}
 		} catch (error) {
 			if (error.response.status === 404) {
@@ -26,15 +28,15 @@ function index() {
 			}
 		}
 		setWait(false)
-		setUserId("")
+		setEmail("")
 	}
 	return (
 		<div className="w-full h-screen flex justify-center items-center  text-gray-700">
 			<div className="flex flex-col  gap-5 p-10 sm:p-0">
 				<h1 className=" text-5xl  font-bold ">Forgot Password?</h1>
 				<p>
-					Don't worry! It occurs. Please enter your <br />registered mobile
-					number
+					Don't worry! It occurs. Please enter your <br />
+					registered email Id.
 				</p>
 				<form onSubmit={handleSubmit} className="sm:w-3/4  ">
 					<div className="text-xl flex flex-col mb-4">
@@ -47,9 +49,7 @@ function index() {
 							id="email"
 							placeholder="Enter your emailId"
 							value={email}
-							onChange={(e) =>
-								setEmail(e.target.value)
-							}
+							onChange={(e) => setEmail(e.target.value)}
 							className="w-full border border-gray-300 p-2 rounded"
 							required
 						/>
@@ -68,4 +68,4 @@ function index() {
 	)
 }
 
-export default index
+export default ForgotPassword
