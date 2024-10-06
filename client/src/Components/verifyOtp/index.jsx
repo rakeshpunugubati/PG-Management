@@ -6,33 +6,31 @@ function VerifyOtp({ n = 6 }) {
 	const [verifyOtp, setVerifyOtp] = useState("")
 	const ref = useRef([])
 	const [loading, setLoading] = useState(true)
+	const [wait, setWait] = useState(false)
 	const navigate = useNavigate()
-	
-	const handleSubmit = async () => {
-		try {
-			const response = axios.get("http://localhost:5000/verifyotp", {
-				userOtp: verifyOtp,
-			})
-		} catch (error) {}
-	}
 
-	const checkOtpAccess = async () => {
+	const handleSubmit = async () => {
+		setWait(true)
 		try {
-			const response = await axios.get(
+			const response = await axios.post(
 				"http://localhost:5000/verifyotp",
+				{ userOtp: verifyOtp },
 				{ withCredentials: true }
 			)
-			console.log(response)
-			setLoading(false)
-			// If successful, continue as planned.
+			if (response.status === 200) {
+				navigate("/resetpassword")
+			}
 		} catch (error) {
-			if (error.response.status === 401) {
+			if (error.response.status === 400) {
 				console.log(error.response.data.message)
+			} else if (error.response.status === 403) {
+				console.log(error.response.data.message)
+				navigate("/forgotpassword")
 			} else {
 				console.log("An error occurred: ", error.message)
 			}
-			navigate("/forgotpassword")
 		}
+		setWait(false)
 	}
 
 	const handleKeyDown = (e, index) => {
@@ -54,10 +52,29 @@ function VerifyOtp({ n = 6 }) {
 	}
 
 	useEffect(() => {
-		if (ref.current[0]) {
-			ref.current[0].focus()
+		const checkOtpAccess = async () => {
+			try {
+				const response = await axios.get(
+					"http://localhost:5000/verifyotp",
+					{ withCredentials: true }
+				)
+				console.log(response)
+				setLoading(false)
+
+				if (ref.current[0]) {
+					ref.current[0].focus()
+				}
+				// If successful, continue as planned.
+			} catch (error) {
+				if (error.response.status === 401 || 403) {
+					console.log(error.response.data.message)
+				} else {
+					console.log("An error occurred: ", error)
+				}
+				navigate("/forgotpassword")
+			}
 		}
-		// checkOtpAccess()
+		checkOtpAccess();
 	}, [])
 
 	if (loading) {
@@ -94,7 +111,8 @@ function VerifyOtp({ n = 6 }) {
 					})}
 				</div>
 				<button
-					onSubmit={handleSubmit}
+					disabled={wait}
+					onClick={handleSubmit}
 					className="text-xl text-black w-full p-2 bg-green-500 rounded-md"
 				>
 					Verify OTP

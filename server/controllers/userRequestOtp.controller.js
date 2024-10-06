@@ -10,6 +10,7 @@ const userRequestOtp = async (req, res) => {
 		console.log(`exist: ${exist._id}`)
 		if (exist) {
 			const otp = generateOtp()
+			console.log(otp);
 			const otpexist = await otpcenter.exists({ email })
 			// console.log(otpexist)
 			if (otpexist) {
@@ -21,11 +22,11 @@ const userRequestOtp = async (req, res) => {
 					{ $set: { otp, createdAt: Date.now() } }
 				)
 				console.log(updatedOpt)
-				const payLoad = { id: updatedOpt._id }
+				const payLoad = { id }
 				const verifyToken = createToken(payLoad)
 				// console.log(verifyToken);
-				res.clearCookie("verifyToken")
-				res.cookie("verifyToken", verifyToken, {
+				res.clearCookie("verifyOtpToken")
+				res.cookie("verifyOtpToken", verifyToken, {
 					httpOnly: true,
 					secure: false, // set secure to true during production
 					maxAge: 300000,
@@ -37,7 +38,7 @@ const userRequestOtp = async (req, res) => {
 				const payLoad = { id: otpcreated._id }
 				const verifyToken = createToken(payLoad)
 				// console.log(verifyToken);
-				res.cookie("verifyToken", verifyToken, {
+				res.cookie("verifyOtpToken", verifyToken, {
 					httpOnly: true,
 					secure: false, // set secure to true during production
 					maxAge: 300000,

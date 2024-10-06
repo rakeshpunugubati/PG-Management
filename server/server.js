@@ -15,13 +15,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use('/', router);
-// app.get("/verifyotp", async (req, res) => {
-// 	if (!req.cookies["verifyToken"]) {
-// 		return res.status(401).json({ message: "Unauthorized Action" })
-// 	}
 
-// 	res.status(200).send("you have access")
-// })
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
