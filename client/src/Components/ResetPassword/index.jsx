@@ -1,30 +1,56 @@
 import axios from "axios"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-
 
 function ResetPassword() {
 	const [password, setPassword] = useState("")
 	const [confirmPassword, setConfirmPassword] = useState("")
-	const [wait, setWait] = useState(false)
-  const navigate = useNavigate()
+	const [wait, setWait] = useState(false);
+  const [loading, setLoading] =useState(true);
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		const checkOtpAccess = async () => {
+			try {
+				const response = await axios.get(
+					"http://localhost:5000/resetpassword",
+					{ withCredentials: true }
+				)
+				console.log(response.data.message)
+				setLoading(false)
+			} catch (error) {
+				console.log(error.response.data.message)
+				navigate("/forgotpassword")
+			}
+		}
+		checkOtpAccess()
+	}, [])
+
+  if(loading){
+    return <div>Loading...</div>
+  }
 	const handleSubmit = async (e) => {
 		e.preventDefault()
-		setWait(true);
-    try{
-      const response = await axios.post("http://localhost:5000/resetpassword", {password}, { withCredentials: true });
-      if(response.status === 200){
-        console.log(response.data.message);
-        navigate('/');
-      }
-    }catch(error){
-      if(error.response.status === 403){
-        navigate('/forgotpassword')
-      }
-      console.log(error.response.data.message);
-    }
+		setWait(true)
+		try {
+			const response = await axios.post(
+				"http://localhost:5000/resetpassword",
+				{ password },
+				{ withCredentials: true }
+			)
+			if (response.status === 200) {
+				console.log(response.data.message)
+				alert(response.data.message)
+				navigate("/login")
+			}
+		} catch (error) {
+			if (error.response.status === 403) {
+				navigate("/forgotpassword")
+			}
+			console.log(error.response.data.message)
+		}
 
-    setWait(false)
+		setWait(false)
 	}
 	const validateConfirmPassword = (e) => {
 		const confirmPassword = e.target.value
@@ -70,7 +96,6 @@ function ResetPassword() {
 							setConfirmPassword(e.target.value)
 							validateConfirmPassword(e)
 						}}
-            
 						className="w-full border border-gray-300 p-2 rounded"
 						required
 					/>

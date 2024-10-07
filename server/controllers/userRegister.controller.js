@@ -5,7 +5,7 @@ const userRegister = async (req, res) => {
 
 	try {
 		const exist = await logincredentials.exists({ userId: req.body.userId })
-		console.log(`User Exist:  ${exist ? "exist":"not exist"}`)
+		console.log(`{User Exist:  ${exist ? "exist":"not exist"}`)
 		if (exist) {
 			return res.status(409).json({ message: "User already exists" })
 		}

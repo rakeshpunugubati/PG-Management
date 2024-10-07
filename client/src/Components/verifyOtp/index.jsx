@@ -23,7 +23,7 @@ function VerifyOtp({ n = 6 }) {
 		} catch (error) {
 			if (error.response.status === 400) {
 				console.log(error.response.data.message)
-			} else if (error.response.status === 403) {
+			} else if (error.response.status === 401) {
 				console.log(error.response.data.message)
 				navigate("/forgotpassword")
 			} else {
@@ -64,17 +64,12 @@ function VerifyOtp({ n = 6 }) {
 				if (ref.current[0]) {
 					ref.current[0].focus()
 				}
-				// If successful, continue as planned.
 			} catch (error) {
-				if (error.response.status === 401 || 403) {
-					console.log(error.response.data.message)
-				} else {
-					console.log("An error occurred: ", error)
-				}
+				console.log(error.response.data.message)
 				navigate("/forgotpassword")
 			}
 		}
-		checkOtpAccess();
+		checkOtpAccess()
 	}, [])
 
 	if (loading) {

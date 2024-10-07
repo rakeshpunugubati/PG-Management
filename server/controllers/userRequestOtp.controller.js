@@ -1,6 +1,6 @@
 import logincredentials from "../models/user.model.js"
 import otpcenter from "../models/otp.model.js"
-import createToken from "../utils/tokenUtils.js"
+import jwt from 'jsonwebtoken'
 import sendMail from "../utils/nodemailer.js"
 
 const userRequestOtp = async (req, res) => {
@@ -23,30 +23,30 @@ const userRequestOtp = async (req, res) => {
 				)
 				console.log(updatedOpt)
 				const payLoad = { id }
-				const verifyToken = createToken(payLoad)
+				const verifyToken = jwt.sign(payLoad, process.env.JWT_SECRET_KEY, { expiresIn: "5m" })
 				// console.log(verifyToken);
 				res.clearCookie("verifyOtpToken")
 				res.cookie("verifyOtpToken", verifyToken, {
 					httpOnly: true,
 					secure: false, // set secure to true during production
 					maxAge: 300000,
-					sameSite: "Lax",
+					sameSite: "Strict",
 				})
 			} else {
 				const otpcreated = await otpcenter.create({ email, otp })
 				console.log(otpcreated)
 				const payLoad = { id: otpcreated._id }
-				const verifyToken = createToken(payLoad)
+				const verifyToken = jwt.sign(payLoad, process.env.JWT_SECRET_KEY, { expiresIn: "5m" })
 				// console.log(verifyToken);
 				res.cookie("verifyOtpToken", verifyToken, {
 					httpOnly: true,
 					secure: false, // set secure to true during production
 					maxAge: 300000,
-					sameSite: "Lax",
+					sameSite: "Strict",
 				})
 			}
-			const info = await sendMail(email, otp)
-			console.log(info)
+			// const info = await sendMail(email, otp)
+			// console.log(info)
 			return res.status(200).json({ message: "OTP created successfully" })
 		} else {
 			return res.status(404).json({ message: "User does not exist" })

@@ -1,5 +1,5 @@
 import otpcenter from "../models/otp.model.js"
-import createToken from "../utils/tokenUtils.js"
+import jwt from 'jsonwebtoken'
 const userVerifyOtp = async (req, res) => {
 	const { userOtp } = req.body
 
@@ -10,14 +10,14 @@ const userVerifyOtp = async (req, res) => {
 		// console.log(otp)
 		if (otp === userOtp) {
 			const payLoad = { email }
-			const verifyToken = createToken(payLoad);
+			const verifyToken = jwt.sign(payLoad, process.env.JWT_SECRET_KEY, { expiresIn: "5m" });
 			// console.log(verifyToken);
 			res.clearCookie("verifyOtpToken")
 			res.cookie("verifyResetToken", verifyToken, {
 				httpOnly: true,
 				secure: false, // set secure to true during production
 				maxAge: 300000,
-				sameSite: "Lax",
+				sameSite: "Strict",
 				path: '/resetpassword'
 			})
 			return res.status(200).json({ message: "Verified Successfully." })

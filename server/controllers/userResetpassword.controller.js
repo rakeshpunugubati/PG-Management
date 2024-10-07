@@ -6,7 +6,9 @@ const userResetPassword = async (req, res) => {
 	console.log(password)
 	try {
 		const email = req.email
-		await logincredentials.updateOne({ email }, { $set: { password } })
+		console.log(email);
+		const response=await logincredentials.updateOne({ email }, { $set: { password } });
+		console.log(response);
         res.clearCookie("verifyResetToken", { path: "/resetpassword" })
         res.status(200).json({message: "Password Updated Successfully"});
 	} catch (error) {
