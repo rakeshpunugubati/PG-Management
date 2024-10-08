@@ -40,7 +40,7 @@ const userRequestOtp = async (req, res) => {
 				// console.log(verifyToken);
 				res.cookie("verifyOtpToken", verifyToken, {
 					httpOnly: true,
-					secure: false, // set secure to true during production
+					secure: false, 
 					maxAge: 300000,
 					sameSite: "Strict",
 				})
@@ -52,10 +52,10 @@ const userRequestOtp = async (req, res) => {
 			return res.status(404).json({ message: "User does not exist" })
 		}
 	} catch (error) {
-		console.log(error)
+		console.log(error.message)
 		res.status(500).json({
-			message: "Error creating OTP",
-			error: error.message,
+			message: "An error occurred. Please try again.",
+            error: "Internal Server Error",
 		})
 	}
 }

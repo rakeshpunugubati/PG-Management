@@ -17,10 +17,11 @@ const userLogin = async (req, res) => {
 		const payLoad = { userId: user.userId }
 
 		const accessToken = jwt.sign(payLoad, process.env.JWT_SECRET_KEY, { expiresIn: "15m" });
-		
+		res.clearCookie('userAccessToken');
+		res.clearCookie('userRefreshToken');
 		res.cookie("userAccessToken", accessToken, {
 			httpOnly: true,
-			secure: false, // set secure to true during production
+			secure: false, 
 			maxAge: 900000,
 			sameSite: "Strict",
 			
@@ -33,13 +34,13 @@ const userLogin = async (req, res) => {
 			maxAge: 86400000,
 			sameSite: "Strict",
 		});
-
+		
 		res.status(200).json({ message: "Successfully Loged In" })
 	} catch (error) {
 		console.error("Error finding user", error)
 		res.status(500).json({
-			message: "Error Finding user",
-			error: error.message,
+			message: "An error occurred during login. Please try again.",
+            error: "Internal Server Error",
 		})
 	}
 }

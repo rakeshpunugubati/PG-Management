@@ -21,16 +21,21 @@ function VerifyOtp({ n = 6 }) {
 				navigate("/resetpassword")
 			}
 		} catch (error) {
-			if (error.response.status === 400) {
-				console.log(error.response.data.message)
-			} else if (error.response.status === 401) {
-				console.log(error.response.data.message)
-				navigate("/forgotpassword")
+			if (error.response) {
+				if (error.response.status === 400) {
+					alert(error.response.data.message)
+				} else if (error.response.status === 401) {
+					alert(error.response.data.message)
+					navigate("/forgotpassword")
+				} else {
+					alert(error.response.data.message)
+				}
 			} else {
-				console.log("An error occurred: ", error.message)
+				alert("Network error, please try again later.")
 			}
+		} finally {
+			setWait(false)
 		}
-		setWait(false)
 	}
 
 	const handleKeyDown = (e, index) => {
@@ -65,8 +70,12 @@ function VerifyOtp({ n = 6 }) {
 					ref.current[0].focus()
 				}
 			} catch (error) {
-				console.log(error.response.data.message)
-				navigate("/forgotpassword")
+				if (error.response) {
+					alert(error.response.data.message);
+					navigate("/forgotpassword")
+				} else {
+					alert.console.log("Network error, please try again later.")
+				}
 			}
 		}
 		checkOtpAccess()
@@ -76,15 +85,12 @@ function VerifyOtp({ n = 6 }) {
 		return <div>Loading...</div>
 	}
 	return (
-		<div className="w-full h-screen flex  justify-center items-center  text-gray-700 ">
-			<div className="flex flex-col  gap-5 p-10 sm:p-0">
+		<div className="w-full h-screen flex  justify-center items-center  text-gray-800 ">
+			<div className="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 p-10 sm:p-8 rounded-lg shadow-md flex flex-col gap-5">
 				<h1 className=" w-full  text-5xl font-bold">
 					OTP Verification
 				</h1>
-				<p>
-					Enter the verification code we just sent to your mobile
-					number
-				</p>
+				<p>Enter the verification code we just sent to your email Id</p>
 
 				<div className=" w-full flex justify-center">
 					{otp.map((value, index) => {
@@ -100,7 +106,7 @@ function VerifyOtp({ n = 6 }) {
 								onChange={(e) =>
 									handleChange(e.target.value, index)
 								}
-								className="w-12 h-12 p-2 m-1 border-2 focus:outline-green-500 border-gray-400 rounded-md"
+								className="w-12 h-12 sm:w-14 sm:h-14 text-2xl text-center  m-1 border-2 focus:outline-green-500 border-gray-400 rounded-md"
 							/>
 						)
 					})}
@@ -108,7 +114,7 @@ function VerifyOtp({ n = 6 }) {
 				<button
 					disabled={wait}
 					onClick={handleSubmit}
-					className="text-xl text-black w-full p-2 bg-green-500 rounded-md"
+					className="text-xl bg-green-500 w-full text-white px-6 py-3 rounded-lg shadow hover:bg-green-600 transition duration-300"
 				>
 					Verify OTP
 				</button>

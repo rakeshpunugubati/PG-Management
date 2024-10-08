@@ -6,9 +6,7 @@ const verifyAccessToken = (cookieName) => {
 
 		if (!token) {
 			console.log("Token Expired or Invalid authorization")
-			return res
-				.status(401)
-				.json({ message: "Token Expired or Invalid authorization" })
+			return res.status(401).json({ message: "Token Expired or Invalid authorization" })
 		}
 
 		try {
@@ -27,7 +25,8 @@ const verifyAccessToken = (cookieName) => {
 
 			next()
 		} catch (error) {
-			return res.status(401).json({message: "Token has expired, please request a new OTP"})
+			console.log(error.message);
+			return res.status(401).json({message: "Session has expired, please request a new OTP"})
 		}
 	}
 }

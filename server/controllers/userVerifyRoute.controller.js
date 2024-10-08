@@ -9,8 +9,8 @@ const userVerifyRoute = (tokenType) => {
         }
 
         try {
-            await jwt.verify(token, process.env.JWT_SECRET_KEY); // Verify the token
-            return res.status(200).json({ message: "You are authorized " }); // Return success message
+            await jwt.verify(token, process.env.JWT_SECRET_KEY); 
+            return res.status(200).json({ message: "You are authorized " }); 
         } catch (error) {
             return res.status(401).json({ message: "Token has expired, please request a new OTP" });
         }

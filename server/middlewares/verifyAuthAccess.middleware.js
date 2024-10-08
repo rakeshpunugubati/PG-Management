@@ -12,7 +12,7 @@ const verifyAuthAccess = async (req, res, next) => {
             console.log("Access token is invalid or expired:", error.message);
             res.clearCookie("userAccessToken");
             if (!refreshToken) {
-                return res.status(401).json({ message: "Session expired. Please log in again." });
+                return res.status(401).json({ message: "Session has expired. Please log in again." });
             }
         }
     }
