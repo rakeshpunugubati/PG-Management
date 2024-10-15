@@ -14,7 +14,9 @@ const corseOptioins = {
 	credentials: true,
 }
 app.use(cors(corseOptioins))
+
 app.use(express.json())
+
 app.use(cookieParser())
 
 app.use('/', router);
